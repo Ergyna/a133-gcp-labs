@@ -1,32 +1,22 @@
 steps:
-    -
-        name: gcr.io/cloud-builders/docker
-        args:
-            - build
-            - '-t'
-            - 'gcr.io/$PROJECT_ID/crud-op:cloudbuild-$BRANCH_NAME-$SHORT_SHA'
-            - .
-    -
-    
-   
-        name: gcr.io/cloud-builders/docker
-        args:
-            - tag
-            - 'gcr.io/$PROJECT_ID/crud-op:cloudbuild-$BRANCH_NAME-$SHORT_SHA'
-            - 'gcr.io/$PROJECT_ID/crud-op:cloudbuild-$BRANCH_NAME-latest'
-            
-    -
-        name: 'gcr.io/cloud-builders/docker'
-        args:
-            - push 
-            - 'gcr.io/$PROJECT_ID/crud-op:cloudbuild-$BRANCH_NAME-$SHORT_SHA'
-    -
-            
-        name: 'gcr.io/cloud-builders/docker'
-        args:
-            - push 
-            - 'gcr.io/$PROJECT_ID/crud-op:cloudbuild-$BRANCH_NAME-latest'
-            
-images:
-          - 'gcr.io/$PROJECT_ID/crud-op:cloudbuild-$BRANCH_NAME-$SHORT_SHA'
-          - 'gcr.io/$PROJECT_ID/crud-op:cloudbuild-$BRANCH_NAME-latest'
+  # Langkah pertama: Menggunakan Node.js 14 sebagai runtime
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/a133-gcp-labs', '.']
+  
+  # Langkah kedua: Mengirim gambar Docker ke Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/a133-gcp-labs']
+  
+  # Langkah ketiga: Menerapkan layanan Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'a133-gcp-labs'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/a133-gcp-labs'
+      - '--platform'
+      - 'managed'
+      - '--region'
+      - 'asia-east1'
+      - '--allow-unauthenticated'
